@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fff0f3" />
+      <stop offset="100%" stop-color="#ffd9e2" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)" />
+  <text x="80" y="250" font-size="82" fill="#ff4d6d" font-family="Segoe UI, sans-serif" font-weight="700">
+    Walentynka 3D-ish
+  </text>
+  <text x="80" y="340" font-size="40" fill="#590d22" font-family="Segoe UI, sans-serif">
+    React + TypeScript + runaway NIE + hearts canvas
+  </text>
+  <text x="80" y="470" font-size="120">=Œ=•</text>
+</svg>

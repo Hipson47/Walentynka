@@ -1,0 +1,32 @@
+---
+description: Validation format for writing Cursor .mdc rule files
+globs: "**/*.mdc"
+alwaysApply: false
+---
+
+# MDC Rule Format
+
+## What to do
+
+- Start each `.mdc` with YAML frontmatter.
+- Include `description` and either `alwaysApply: true` or scoped `globs`.
+- Keep rules short, actionable, and repository-specific.
+
+## Don't do
+
+- Do not omit frontmatter fields.
+- Do not mix legacy `.cursorrules` style blocks into `.mdc`.
+
+## Template
+
+```md
+---
+description: Short rule intent
+globs: "src/**/*.tsx"
+alwaysApply: false
+---
+
+# Rule Title
+
+- Actionable instruction
+```

@@ -1,106 +1,26 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pl">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Walentynka 💕</title>
-    <link rel="stylesheet" href="./styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600&display=swap"
-        rel="stylesheet">
-</head>
-
-<body>
-    <div id="app">
-        <!-- View 1: Intro Envelope -->
-        <div id="view-intro" class="screen">
-            <div class="envelope" id="envelope">
-                <div class="envelope-flap"></div>
-                <div class="envelope-body">
-                    <div class="envelope-heart">💌</div>
-                    <p class="envelope-text">Kliknij, aby otworzyć</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- View 2: Ask Question -->
-        <div id="view-ask" class="screen hidden">
-            <div class="card">
-                <div class="image-container">
-                    <img src="./assets/ask.gif" alt="Proszę" class="gif" id="ask-gif">
-                    <div class="gif-fallback" id="ask-fallback">🥺💕</div>
-                </div>
-                <h1 id="ask-headline">Dziubas, czy zostaniesz moją walentynką?</h1>
-                <div class="buttons">
-                    <button id="yes-btn" class="btn btn-primary">TAK</button>
-                    <button id="no-btn" class="btn btn-secondary">NIE</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- View 3: Celebrate -->
-        <div id="view-celebrate" class="screen hidden">
-            <div class="card">
-                <div class="image-container">
-                    <img src="./assets/yay.gif" alt="Yay!" class="gif" id="celebrate-gif">
-                    <div class="gif-fallback" id="celebrate-fallback">🎉❤️🎉</div>
-                </div>
-                <h1>Yay, Kocham Cię najmocniej na świecie &lt;3</h1>
-            </div>
-        </div>
-
-        <!-- View 4: Choice -->
-        <div id="view-choice" class="screen hidden">
-            <div class="card card-wide">
-                <h1>Co robimy na randce?</h1>
-                <div class="choice-grid">
-                    <button class="choice-card" data-choice="Kolacja 🍝">
-                        <span class="choice-icon">🍝</span>
-                        <span class="choice-label">Kolacja</span>
-                    </button>
-                    <button class="choice-card" data-choice="Kino 🎬">
-                        <span class="choice-icon">🎬</span>
-                        <span class="choice-label">Kino</span>
-                    </button>
-                    <button class="choice-card" data-choice="Spacer + kawa ☕">
-                        <span class="choice-icon">☕</span>
-                        <span class="choice-label">Spacer + kawa</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- View 5: Final -->
-        <div id="view-final" class="screen hidden">
-            <div class="card">
-                <div class="image-container">
-                    <img src="./assets/yay.gif" alt="Yay!" class="gif" id="final-gif">
-                    <div class="gif-fallback" id="final-fallback">💖</div>
-                </div>
-                <h1>To ustalone!</h1>
-                <p class="final-choice" id="final-choice-text">Wybrałaś: ...</p>
-                <p class="final-subtext">Nie mogę się doczekać! 💕</p>
-                <button id="ps-btn" class="btn btn-primary">PS... 💌</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal for PS message -->
-    <div id="modal-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-        <div class="modal-panel">
-            <button id="modal-close" class="modal-close" aria-label="Zamknij">&times;</button>
-            <h2 id="modal-title">PS...</h2>
-            <div class="modal-content">
-                <p>Chciałem Ci powiedzieć, że jesteś najwspanialszą osobą jaką znam. 💕</p>
-                <p>Każdego dnia cieszę się, że jesteś w moim życiu. Dziękuję za wszystko co robisz.</p>
-                <p>Kocham Cię! ❤️</p>
-            </div>
-        </div>
-    </div>
-
-    <script src="./script.js"></script>
-</body>
-
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Walentynka 3D-ish</title>
+    <meta
+      name="description"
+      content="Interaktywna kartka walentynkowa w React + TypeScript: koperta, uciekające NIE, serca i finał z PS."
+    />
+    <meta name="theme-color" content="#ff4d6d" />
+    <meta property="og:title" content="Walentynka 3D-ish" />
+    <meta
+      property="og:description"
+      content="Single-page Valentine card: intro, pytanie, celebracja, wybór i finał."
+    />
+    <meta property="og:image" content="/assets/og.svg" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pl_PL" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>
