@@ -67,6 +67,7 @@ export function App() {
         <span className="bg-blob blob-c" />
       </div>
       <div className="bg-grain" aria-hidden="true" />
+      <div className="bg-vignette" aria-hidden="true" />
       {currentView}
     </div>
   );
