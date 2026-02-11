@@ -272,9 +272,17 @@ body {
 }
 
 .envelope-shell {
+  --x: 0px;
+  --y: 0px;
+  --rot: 0deg;
+  --scale: 1;
   position: absolute;
   left: 50%;
   top: 50%;
+  transform:
+    translate3d(var(--x), var(--y), 0)
+    scale(var(--scale))
+    rotate(var(--rot));
   transform-origin: 72% 34%;
   will-change: transform;
   pointer-events: none;
