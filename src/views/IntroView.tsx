@@ -9,6 +9,7 @@ import {
   stepScrollVelocity,
   type ScrollVelocityState,
 } from "../utils/scrollVelocity";
+import { heartXY } from "../utils/heartPath";
 
 type IntroViewProps = {
   onOpen: () => void;
@@ -21,6 +22,7 @@ export function IntroView({ onOpen }: IntroViewProps) {
   const { mode: motionMode } = useMotionMode();
   const introRootRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
+  const envelopeButtonRef = useRef<HTMLButtonElement>(null);
   const velocityStateRef = useRef<ScrollVelocityState | null>(null);
   const decayRafRef = useRef(0);
   const targetScrollTopRef = useRef(0);
@@ -42,6 +44,7 @@ export function IntroView({ onOpen }: IntroViewProps) {
   const targetProgressRef = useRef(0);
   const animatedProgressRef = useRef(0);
   const envelopeRafRef = useRef(0);
+  const envelopeLastTsRef = useRef<number | null>(null);
 
   const velocityParams = DEFAULT_SCROLL_VELOCITY_PARAMS;
   const debugEnabled = useMemo(() => {
@@ -154,37 +157,51 @@ export function IntroView({ onOpen }: IntroViewProps) {
   const envelopeReady = effectiveProgress >= 0.985;
 
   useEffect(() => {
-    let active = true;
-    const tick = () => {
-      if (!active) return;
-      const target = motionMode === "off" ? 1 : targetProgressRef.current;
-      const current = animatedProgressRef.current + (target - animatedProgressRef.current) * 0.12;
-      animatedProgressRef.current = Math.abs(target - current) < 0.0005 ? target : current;
-
-      const p = easeInOutSine(animatedProgressRef.current);
+    const computePose = (progress: number): EnvelopePose => {
+      const p = easeInOutSine(Math.min(1, Math.max(0, progress)));
       const a = p * Math.PI * 2;
       const da = 0.002 * Math.PI * 2;
+      const { x, y } = heartXY(a);
+      const next = heartXY(a + da);
 
-      const x = 16 * Math.pow(Math.sin(a), 3);
-      const y = 13 * Math.cos(a) - 5 * Math.cos(2 * a) - 2 * Math.cos(3 * a) - Math.cos(4 * a);
-      const x2 = 16 * Math.pow(Math.sin(a + da), 3);
-      const y2 = 13 * Math.cos(a + da) - 5 * Math.cos(2 * (a + da)) - 2 * Math.cos(3 * (a + da)) - Math.cos(4 * (a + da));
+      const envelopeWidth = envelopeButtonRef.current?.clientWidth ?? 340;
+      const envelopeHeight = envelopeButtonRef.current?.clientHeight ?? 216;
+      const margin = 18;
+      const halfW = viewportSize.width / 2 - envelopeWidth / 2 - margin;
+      const halfH = viewportSize.height / 2 - envelopeHeight / 2 - margin;
+      const safeScale = Math.max(2, Math.min(halfW / 16, halfH / 17));
+      const baseScale = Number.isFinite(safeScale) ? safeScale : 8;
 
-      const minSide = Math.min(viewportSize.width, viewportSize.height);
-      const baseScale = minSide / 40;
       const depth = 0.9 + 0.2 * (1 - Math.max(-1, Math.min(1, y / 17)));
       const px = x * baseScale;
       const py = -y * baseScale;
-      const px2 = x2 * baseScale;
-      const py2 = -y2 * baseScale;
+      const px2 = next.x * baseScale;
+      const py2 = -next.y * baseScale;
       const rot = (Math.atan2(py2 - py, px2 - px) * 180) / Math.PI;
 
-      setEnvelopePose({
-        x: px,
-        y: py,
-        scale: depth,
-        rotateDeg: rot,
-      });
+      return { x: px, y: py, scale: depth, rotateDeg: rot };
+    };
+
+    if (motionMode === "off") {
+      animatedProgressRef.current = 1;
+      setEnvelopePose(computePose(1));
+      return () => {
+        cancelAnimationFrame(envelopeRafRef.current);
+      };
+    }
+
+    let active = true;
+    const tick = (now: number) => {
+      if (!active) return;
+      const lastTs = envelopeLastTsRef.current ?? now;
+      const dt = Math.max(0.008, Math.min(0.05, (now - lastTs) / 1000));
+      envelopeLastTsRef.current = now;
+
+      const target = targetProgressRef.current;
+      const alpha = 1 - Math.exp(-10 * dt);
+      const current = animatedProgressRef.current + (target - animatedProgressRef.current) * alpha;
+      animatedProgressRef.current = Math.abs(target - current) < 0.0005 ? target : current;
+      setEnvelopePose(computePose(animatedProgressRef.current));
 
       envelopeRafRef.current = requestAnimationFrame(tick);
     };
@@ -192,6 +209,7 @@ export function IntroView({ onOpen }: IntroViewProps) {
     envelopeRafRef.current = requestAnimationFrame(tick);
     return () => {
       active = false;
+      envelopeLastTsRef.current = null;
       cancelAnimationFrame(envelopeRafRef.current);
     };
   }, [motionMode, viewportSize.height, viewportSize.width]);
@@ -252,6 +270,7 @@ export function IntroView({ onOpen }: IntroViewProps) {
       <div className="intro-envelope-layer">
         <div className="envelope-shell" style={envelopeStyle}>
           <button
+            ref={envelopeButtonRef}
             type="button"
             className={`envelope ${opening ? "opening" : ""} ${envelopeReady ? "ready" : ""}`}
             onClick={handleOpen}

@@ -281,9 +281,10 @@ body {
   top: 50%;
   transform:
     translate3d(var(--x), var(--y), 0)
-    scale(var(--scale))
-    rotate(var(--rot));
-  transform-origin: 72% 34%;
+    translate(-50%, -50%)
+    rotate(var(--rot))
+    scale(var(--scale));
+  transform-origin: center center;
   will-change: transform;
   pointer-events: none;
 }
