@@ -2,18 +2,14 @@ import { test, expect, type Page } from "@playwright/test";
 
 /**
  * Helper: navigate from intro to ask screen.
- * Uses Off mode for instant envelope landing, then clicks the envelope button.
+ * Scrolls through intro flight path, then opens envelope.
  */
 async function navigateToAsk(page: Page) {
-  await page.getByRole("button", { name: "Off" }).click();
-
-  // Scroll to landing section
   const stage = page.locator(".intro-stage");
   await stage.evaluate((el) => el.scrollTo(0, el.scrollHeight));
-  await page.waitForTimeout(600);
+  await page.waitForTimeout(900);
 
-  // Click the envelope button directly (it's always clickable and not obscured)
-  const envelope = page.locator("button.envelope");
+  const envelope = page.getByRole("button", { name: "Dla Ciebie" });
   await expect(envelope).toBeVisible({ timeout: 5000 });
   await envelope.click();
 
@@ -61,32 +57,12 @@ test.describe("Intro Screen", () => {
     await expect(page.getByText("Mała niespodzianka")).toBeVisible();
   });
 
-  test("shows motion mode toggle with three buttons", async ({ page }) => {
-    await expect(page.getByText("Full")).toBeVisible();
-    await expect(page.getByText("Lite")).toBeVisible();
-    await expect(page.getByText("Off")).toBeVisible();
-  });
-
-  test("motion mode toggle changes active state", async ({ page }) => {
-    const liteBtn = page.getByRole("button", { name: "Lite" });
-    await liteBtn.click();
-    await expect(liteBtn).toHaveClass(/active/);
-
-    const offBtn = page.getByRole("button", { name: "Off" });
-    await offBtn.click();
-    await expect(offBtn).toHaveClass(/active/);
-  });
-
-  test("skip intro button reveals CTA", async ({ page }) => {
-    const skipBtn = page.getByRole("button", { name: "Pomiń animację intro" });
-    await skipBtn.click();
-
-    // Scroll to landing
-    const stage = page.locator(".intro-stage");
-    await stage.evaluate((el) => el.scrollTo(0, el.scrollHeight));
-    await page.waitForTimeout(500);
-
-    await expect(page.locator(".intro-cta.cta-visible")).toBeVisible({ timeout: 3000 });
+  test("does not render legacy intro controls", async ({ page }) => {
+    await expect(page.getByRole("button", { name: "Full" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Lite" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Off" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Pomiń animację intro" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Otwórz" })).toHaveCount(0);
   });
 
   test("envelope opens and transitions to ask screen", async ({ page }) => {
@@ -213,12 +189,11 @@ test.describe("Runaway NIE Button", () => {
 test.describe("Accessibility", () => {
   test("envelope is a semantic button", async ({ page }) => {
     await page.goto("/");
-    await page.getByRole("button", { name: "Off" }).click();
     const stage = page.locator(".intro-stage");
     await stage.evaluate((el) => el.scrollTo(0, el.scrollHeight));
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(900);
 
-    const envelope = page.locator("button.envelope");
+    const envelope = page.getByRole("button", { name: "Dla Ciebie" });
     await expect(envelope).toBeVisible({ timeout: 3000 });
     await expect(envelope).toHaveAttribute("type", "button");
   });
@@ -234,10 +209,9 @@ test.describe("Accessibility", () => {
     await expect(dialog).toHaveAttribute("aria-labelledby", "modal-title");
   });
 
-  test("motion mode toggle has group role", async ({ page }) => {
+  test("intro renders ambient scroll whisper", async ({ page }) => {
     await page.goto("/");
-    const toggle = page.getByRole("group", { name: "Tryb animacji" });
-    await expect(toggle).toBeVisible();
+    await expect(page.getByText("Przewiń w dół, aby sprowadzić kopertę")).toBeVisible();
   });
 
   test("hearts canvas overlay is aria-hidden", async ({ page }) => {

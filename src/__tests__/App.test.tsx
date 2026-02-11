@@ -22,10 +22,8 @@ describe("App", () => {
     expect(container.querySelector(".bg-grain")).toBeInTheDocument();
   });
 
-  it("renders motion mode toggle on intro", () => {
+  it("renders intro envelope button", () => {
     render(<App />);
-    expect(screen.getByText("Full")).toBeInTheDocument();
-    expect(screen.getByText("Lite")).toBeInTheDocument();
-    expect(screen.getByText("Off")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Dla Ciebie" })).toBeInTheDocument();
   });
 });

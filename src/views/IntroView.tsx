@@ -14,23 +14,139 @@ type IntroViewProps = {
   onOpen: () => void;
 };
 
+type Point = { x: number; y: number };
+type BezierSegment = {
+  end: number;
+  p0: Point;
+  c1: Point;
+  c2: Point;
+  p1: Point;
+};
+type FlightVariant = {
+  key: "rose" | "velvet" | "moonlight";
+  segments: BezierSegment[];
+  scaleNearStart: number;
+  scaleFar: number;
+  scaleNearEnd: number;
+  wobbleStart: number;
+  wobbleEnd: number;
+  wobbleAmp: number;
+  flutterUntil: number;
+  flutterAmp: number;
+  rotationOffsetDeg: number;
+  rotationClampDeg: number;
+};
+
+function cubicBezierPoint(p0: Point, c1: Point, c2: Point, p1: Point, t: number): Point {
+  const u = Math.min(1, Math.max(0, t));
+  const m = 1 - u;
+  const m2 = m * m;
+  const u2 = u * u;
+  const x = m2 * m * p0.x + 3 * m2 * u * c1.x + 3 * m * u2 * c2.x + u2 * u * p1.x;
+  const y = m2 * m * p0.y + 3 * m2 * u * c1.y + 3 * m * u2 * c2.y + u2 * u * p1.y;
+  return { x, y };
+}
+
+function cubicBezierTangent(p0: Point, c1: Point, c2: Point, p1: Point, t: number): Point {
+  const u = Math.min(1, Math.max(0, t));
+  const m = 1 - u;
+  const x = 3 * m * m * (c1.x - p0.x) + 6 * m * u * (c2.x - c1.x) + 3 * u * u * (p1.x - c2.x);
+  const y = 3 * m * m * (c1.y - p0.y) + 6 * m * u * (c2.y - c1.y) + 3 * u * u * (p1.y - c2.y);
+  return { x, y };
+}
+
+const FLIGHT_VARIANTS: Record<FlightVariant["key"], FlightVariant> = {
+  // Default: classic romantic heart with balanced width.
+  rose: {
+    key: "rose",
+    segments: [
+      { end: 0.34, p0: { x: 0.7, y: -0.2 }, c1: { x: 0.5, y: -0.62 }, c2: { x: -0.66, y: -0.54 }, p1: { x: -0.62, y: 0.12 } },
+      { end: 0.58, p0: { x: -0.62, y: 0.12 }, c1: { x: -0.58, y: -0.08 }, c2: { x: -0.3, y: -0.44 }, p1: { x: 0, y: -0.16 } },
+      { end: 0.8, p0: { x: 0, y: -0.16 }, c1: { x: 0.22, y: -0.42 }, c2: { x: 0.48, y: -0.08 }, p1: { x: 0.34, y: 0.08 } },
+      { end: 0.94, p0: { x: 0.34, y: 0.08 }, c1: { x: 0.2, y: 0.3 }, c2: { x: 0.08, y: 0.4 }, p1: { x: 0.01, y: 0.41 } },
+      { end: 1, p0: { x: 0.01, y: 0.41 }, c1: { x: 0.01, y: 0.47 }, c2: { x: 0, y: 0.52 }, p1: { x: 0, y: 0.56 } },
+    ],
+    scaleNearStart: 2.05,
+    scaleFar: 0.72,
+    scaleNearEnd: 1.08,
+    wobbleStart: 0.6,
+    wobbleEnd: 0.9,
+    wobbleAmp: 0.028,
+    flutterUntil: 0.22,
+    flutterAmp: 0.016,
+    rotationOffsetDeg: 6,
+    rotationClampDeg: 68,
+  },
+  // Softer, wider top lobes; slower-feeling romantic sweep.
+  velvet: {
+    key: "velvet",
+    segments: [
+      { end: 0.36, p0: { x: 0.74, y: -0.16 }, c1: { x: 0.56, y: -0.6 }, c2: { x: -0.7, y: -0.6 }, p1: { x: -0.66, y: 0.14 } },
+      { end: 0.6, p0: { x: -0.66, y: 0.14 }, c1: { x: -0.62, y: -0.04 }, c2: { x: -0.34, y: -0.42 }, p1: { x: 0, y: -0.2 } },
+      { end: 0.82, p0: { x: 0, y: -0.2 }, c1: { x: 0.26, y: -0.44 }, c2: { x: 0.56, y: -0.1 }, p1: { x: 0.37, y: 0.12 } },
+      { end: 0.95, p0: { x: 0.37, y: 0.12 }, c1: { x: 0.25, y: 0.31 }, c2: { x: 0.1, y: 0.41 }, p1: { x: 0.01, y: 0.43 } },
+      { end: 1, p0: { x: 0.01, y: 0.43 }, c1: { x: 0.01, y: 0.49 }, c2: { x: 0, y: 0.54 }, p1: { x: 0, y: 0.58 } },
+    ],
+    scaleNearStart: 2.12,
+    scaleFar: 0.68,
+    scaleNearEnd: 1.1,
+    wobbleStart: 0.58,
+    wobbleEnd: 0.9,
+    wobbleAmp: 0.022,
+    flutterUntil: 0.2,
+    flutterAmp: 0.012,
+    rotationOffsetDeg: 5,
+    rotationClampDeg: 64,
+  },
+  // Slimmer heart with cleaner descent to tip.
+  moonlight: {
+    key: "moonlight",
+    segments: [
+      { end: 0.33, p0: { x: 0.68, y: -0.24 }, c1: { x: 0.47, y: -0.66 }, c2: { x: -0.58, y: -0.52 }, p1: { x: -0.56, y: 0.06 } },
+      { end: 0.57, p0: { x: -0.56, y: 0.06 }, c1: { x: -0.54, y: -0.1 }, c2: { x: -0.25, y: -0.4 }, p1: { x: 0, y: -0.15 } },
+      { end: 0.79, p0: { x: 0, y: -0.15 }, c1: { x: 0.18, y: -0.38 }, c2: { x: 0.43, y: -0.06 }, p1: { x: 0.3, y: 0.08 } },
+      { end: 0.93, p0: { x: 0.3, y: 0.08 }, c1: { x: 0.2, y: 0.24 }, c2: { x: 0.07, y: 0.35 }, p1: { x: 0.01, y: 0.39 } },
+      { end: 1, p0: { x: 0.01, y: 0.39 }, c1: { x: 0.01, y: 0.46 }, c2: { x: 0, y: 0.5 }, p1: { x: 0, y: 0.55 } },
+    ],
+    scaleNearStart: 1.98,
+    scaleFar: 0.74,
+    scaleNearEnd: 1.06,
+    wobbleStart: 0.62,
+    wobbleEnd: 0.88,
+    wobbleAmp: 0.018,
+    flutterUntil: 0.22,
+    flutterAmp: 0.01,
+    rotationOffsetDeg: 7,
+    rotationClampDeg: 62,
+  },
+};
+
+function sampleFlight(variant: FlightVariant, t: number): { point: Point; tangent: Point } {
+  const clamped = Math.min(1, Math.max(0, t));
+  let prevEnd = 0;
+  let chosen = variant.segments[variant.segments.length - 1];
+  for (const seg of variant.segments) {
+    if (clamped <= seg.end) {
+      chosen = seg;
+      break;
+    }
+    prevEnd = seg.end;
+  }
+  const localT = chosen.end <= prevEnd ? 1 : (clamped - prevEnd) / (chosen.end - prevEnd);
+  return {
+    point: cubicBezierPoint(chosen.p0, chosen.c1, chosen.c2, chosen.p1, localT),
+    tangent: cubicBezierTangent(chosen.p0, chosen.c1, chosen.c2, chosen.p1, localT),
+  };
+}
+
 export function IntroView({ onOpen }: IntroViewProps) {
-  const { mode: motionMode, setMode: setMotionMode } = useMotionMode();
+  const { mode: motionMode } = useMotionMode();
   const introRootRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
-  const landingRef = useRef<HTMLElement>(null);
   const velocityStateRef = useRef<ScrollVelocityState | null>(null);
   const decayRafRef = useRef(0);
   const targetScrollTopRef = useRef(0);
   const debugLastCommitTsRef = useRef(0);
-  const triggerHoldStartRef = useRef<number | null>(null);
-  const hasTriggeredFlyInRef = useRef(false);
-  const flyRafRef = useRef(0);
-  const flyStartTsRef = useRef(0);
-  const landingRectRef = useRef({ width: 320, height: 320 });
-  const ctaDelayTimeoutRef = useRef<number | null>(null);
-  const ctaEnableTimeoutRef = useRef<number | null>(null);
-  const ctaSkipFadeTimeoutRef = useRef<number | null>(null);
   const [opening, setOpening] = useState(false);
   const [vNorm, setVNorm] = useState(0);
   const [debugMetrics, setDebugMetrics] = useState({ scrollTop: 0, vRaw: 0, vSmooth: 0, vNorm: 0 });
@@ -39,14 +155,12 @@ export function IntroView({ onOpen }: IntroViewProps) {
     backend: "css",
   });
   const [isIntroVisible, setIsIntroVisible] = useState(true);
-  const [isLandingVisibleEnough, setIsLandingVisibleEnough] = useState(false);
-  const [flyPhase, setFlyPhase] = useState<"idle" | "flying" | "landed">("idle");
-  const [ctaVisible, setCtaVisible] = useState(false);
-  const [ctaEnabled, setCtaEnabled] = useState(false);
-  const [ctaFastReveal, setCtaFastReveal] = useState(false);
-  const [envelopePose, setEnvelopePose] = useState({ x: 0, y: 0, scale: 0.9, rotateDeg: -12 });
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [viewportSize, setViewportSize] = useState(() => ({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  }));
 
-  const introMotionConfig = valentineConfig.introMotion;
   const velocityParams = DEFAULT_SCROLL_VELOCITY_PARAMS;
   const debugEnabled = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
@@ -57,100 +171,12 @@ export function IntroView({ onOpen }: IntroViewProps) {
       return false;
     }
   }, []);
-
-  const applyIdlePose = useCallback(() => {
-    const width = landingRectRef.current.width;
-    const height = landingRectRef.current.height;
-    const radius = Math.min(width, height) * 0.42;
-    const angle = -0.72;
-    setEnvelopePose({
-      x: Math.cos(angle) * radius,
-      y: Math.sin(angle) * radius,
-      scale: 0.88,
-      rotateDeg: -12,
-    });
+  const flightVariant = useMemo<FlightVariant>(() => {
+    const params = new URLSearchParams(window.location.search);
+    const key = params.get("heartFlight");
+    if (key === "velvet" || key === "moonlight" || key === "rose") return FLIGHT_VARIANTS[key];
+    return FLIGHT_VARIANTS.rose;
   }, []);
-
-  const clearCtaTimers = useCallback(() => {
-    if (ctaDelayTimeoutRef.current) {
-      window.clearTimeout(ctaDelayTimeoutRef.current);
-      ctaDelayTimeoutRef.current = null;
-    }
-    if (ctaEnableTimeoutRef.current) {
-      window.clearTimeout(ctaEnableTimeoutRef.current);
-      ctaEnableTimeoutRef.current = null;
-    }
-    if (ctaSkipFadeTimeoutRef.current) {
-      window.clearTimeout(ctaSkipFadeTimeoutRef.current);
-      ctaSkipFadeTimeoutRef.current = null;
-    }
-  }, []);
-
-  const markLandedAndRevealCta = useCallback(() => {
-    clearCtaTimers();
-    setCtaFastReveal(false);
-    setFlyPhase("landed");
-    setEnvelopePose({ x: 0, y: 0, scale: 1, rotateDeg: 0 });
-    ctaDelayTimeoutRef.current = window.setTimeout(() => {
-      setCtaVisible(true);
-    }, introMotionConfig.ctaDelayMs);
-    ctaEnableTimeoutRef.current = window.setTimeout(() => {
-      setCtaEnabled(true);
-    }, introMotionConfig.ctaDelayMs + introMotionConfig.ctaFadeMs);
-  }, [clearCtaTimers, introMotionConfig.ctaDelayMs, introMotionConfig.ctaFadeMs]);
-
-  const skipToLanded = useCallback(() => {
-    cancelAnimationFrame(flyRafRef.current);
-    hasTriggeredFlyInRef.current = true;
-    setFlyPhase("landed");
-    setEnvelopePose({ x: 0, y: 0, scale: 1, rotateDeg: 0 });
-    clearCtaTimers();
-    setCtaFastReveal(true);
-    setCtaVisible(true);
-    setCtaEnabled(true);
-    ctaSkipFadeTimeoutRef.current = window.setTimeout(() => {
-      setCtaFastReveal(false);
-    }, 120);
-  }, [clearCtaTimers]);
-
-  const startFlyIn = useCallback(() => {
-    if (hasTriggeredFlyInRef.current) return;
-    if (motionMode === "off") {
-      hasTriggeredFlyInRef.current = true;
-      markLandedAndRevealCta();
-      return;
-    }
-
-    hasTriggeredFlyInRef.current = true;
-    setFlyPhase("flying");
-    flyStartTsRef.current = performance.now();
-
-    const width = landingRectRef.current.width;
-    const height = landingRectRef.current.height;
-    const startRadius = Math.min(width, height) * 0.42;
-    const baseAngle = -0.72;
-
-    const tick = (now: number) => {
-      const t = Math.min(1, (now - flyStartTsRef.current) / introMotionConfig.flyDurationMs);
-      const eased = 1 - (1 - t) * (1 - t) * (1 - t);
-      const angle = baseAngle + introMotionConfig.loopsCount * Math.PI * 2 * (1 - eased);
-      const radius = startRadius * (1 - eased);
-      setEnvelopePose({
-        x: Math.cos(angle) * radius,
-        y: Math.sin(angle) * radius,
-        scale: 0.88 + 0.12 * eased,
-        rotateDeg: -12 * (1 - eased),
-      });
-
-      if (t < 1) {
-        flyRafRef.current = requestAnimationFrame(tick);
-      } else {
-        markLandedAndRevealCta();
-      }
-    };
-
-    flyRafRef.current = requestAnimationFrame(tick);
-  }, [introMotionConfig.flyDurationMs, introMotionConfig.loopsCount, markLandedAndRevealCta, motionMode]);
 
   const handleOpen = useCallback(() => {
     if (opening) return;
@@ -174,81 +200,19 @@ export function IntroView({ onOpen }: IntroViewProps) {
   }, []);
 
   useEffect(() => {
-    const stage = stageRef.current;
-    const landing = landingRef.current;
-    if (!stage || !landing) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        const visibleEnough = entry.intersectionRatio >= introMotionConfig.landingIntersectionRatio;
-        setIsLandingVisibleEnough(visibleEnough);
-      },
-      { root: stage, threshold: [0, introMotionConfig.landingIntersectionRatio, 1] },
-    );
-
-    observer.observe(landing);
-    return () => observer.disconnect();
-  }, [introMotionConfig.landingIntersectionRatio]);
-
-  useEffect(() => {
-    const landing = landingRef.current;
-    if (!landing) return;
-
-    const resizeObserver = new ResizeObserver(() => {
-      const rect = landing.getBoundingClientRect();
-      landingRectRef.current = { width: rect.width, height: rect.height };
-      if (flyPhase === "idle") {
-        applyIdlePose();
-      } else if (flyPhase === "landed") {
-        setEnvelopePose({ x: 0, y: 0, scale: 1, rotateDeg: 0 });
-      }
-    });
-
-    resizeObserver.observe(landing);
-    return () => resizeObserver.disconnect();
-  }, [applyIdlePose, flyPhase]);
-
-  useEffect(() => {
-    const onViewportResize = () => {
-      if (flyPhase === "landed") {
-        setEnvelopePose({ x: 0, y: 0, scale: 1, rotateDeg: 0 });
-      }
+    const syncViewport = () => {
+      setViewportSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
     };
-
-    window.addEventListener("resize", onViewportResize);
-    window.addEventListener("orientationchange", onViewportResize);
+    window.addEventListener("resize", syncViewport);
+    window.addEventListener("orientationchange", syncViewport);
     return () => {
-      window.removeEventListener("resize", onViewportResize);
-      window.removeEventListener("orientationchange", onViewportResize);
+      window.removeEventListener("resize", syncViewport);
+      window.removeEventListener("orientationchange", syncViewport);
     };
-  }, [flyPhase]);
-
-  useEffect(() => {
-    if (motionMode === "off") {
-      hasTriggeredFlyInRef.current = true;
-      setFlyPhase("landed");
-      setEnvelopePose({ x: 0, y: 0, scale: 1, rotateDeg: 0 });
-      clearCtaTimers();
-      setCtaFastReveal(false);
-      setCtaVisible(true);
-      setCtaEnabled(true);
-      return;
-    }
-
-    if (flyPhase === "idle") {
-      hasTriggeredFlyInRef.current = false;
-      applyIdlePose();
-      clearCtaTimers();
-      setCtaFastReveal(false);
-      setCtaVisible(false);
-      setCtaEnabled(false);
-    }
-  }, [applyIdlePose, clearCtaTimers, flyPhase, motionMode]);
-
-  useEffect(() => {
-    if (!isLandingVisibleEnough) return;
-    startFlyIn();
-  }, [isLandingVisibleEnough, startFlyIn]);
+  }, []);
 
   useEffect(() => {
     const stage = stageRef.current;
@@ -280,6 +244,8 @@ export function IntroView({ onOpen }: IntroViewProps) {
 
       velocityStateRef.current = nextState;
       setVNorm(nextState.vNorm);
+      const maxScroll = Math.max(1, stage.scrollHeight - stage.clientHeight);
+      setScrollProgress(Math.min(1, Math.max(0, nextPos / maxScroll)));
 
       if (debugEnabled && ts - debugLastCommitTsRef.current >= 100) {
         debugLastCommitTsRef.current = ts;
@@ -289,18 +255,6 @@ export function IntroView({ onOpen }: IntroViewProps) {
           vSmooth: nextState.vSmooth,
           vNorm: nextState.vNorm,
         });
-      }
-
-      if (!hasTriggeredFlyInRef.current) {
-        if (nextState.vNorm >= introMotionConfig.triggerVelocityNorm) {
-          if (triggerHoldStartRef.current === null) {
-            triggerHoldStartRef.current = ts;
-          } else if (ts - triggerHoldStartRef.current >= introMotionConfig.triggerVelocityHoldMs) {
-            startFlyIn();
-          }
-        } else {
-          triggerHoldStartRef.current = null;
-        }
       }
 
       decayRafRef.current = requestAnimationFrame(tick);
@@ -315,25 +269,53 @@ export function IntroView({ onOpen }: IntroViewProps) {
     };
   }, [
     debugEnabled,
-    introMotionConfig.triggerVelocityHoldMs,
-    introMotionConfig.triggerVelocityNorm,
-    startFlyIn,
     velocityParams,
   ]);
 
-  useEffect(() => {
-    return () => {
-      cancelAnimationFrame(flyRafRef.current);
-      clearCtaTimers();
-    };
-  }, [clearCtaTimers]);
+  const effectiveProgress = motionMode === "off" ? 1 : scrollProgress;
+  const envelopeReady = effectiveProgress >= 0.985;
 
-  const envelopeStyle = useMemo(
-    () => ({
-      transform: `translate3d(${envelopePose.x.toFixed(1)}px, ${envelopePose.y.toFixed(1)}px, 0) scale(${envelopePose.scale.toFixed(3)}) rotate(${envelopePose.rotateDeg.toFixed(2)}deg)`,
-    }),
-    [envelopePose],
-  );
+  const envelopeStyle = useMemo(() => {
+    const p = Math.min(1, Math.max(0, effectiveProgress));
+    const smooth = p * p * (3 - 2 * p);
+    const { point, tangent } = sampleFlight(flightVariant, smooth);
+
+    const x = point.x * viewportSize.width;
+    const y = point.y * viewportSize.height;
+    const heading = (Math.atan2(tangent.y, tangent.x) * 180) / Math.PI;
+
+    let scale: number;
+    if (smooth < 0.34) {
+      const k = smooth / 0.34;
+      scale = flightVariant.scaleNearStart + (flightVariant.scaleFar - flightVariant.scaleNearStart) * k;
+    } else if (smooth < 0.74) {
+      const k = (smooth - 0.34) / 0.4;
+      scale = flightVariant.scaleFar + (0.95 - flightVariant.scaleFar) * k;
+    } else {
+      const k = (smooth - 0.74) / 0.26;
+      scale = 0.95 + (flightVariant.scaleNearEnd - 0.95) * k;
+    }
+
+    // Subtle depth wobble only in heart loop section.
+    if (smooth > flightVariant.wobbleStart && smooth < flightVariant.wobbleEnd) {
+      const heartK = (smooth - flightVariant.wobbleStart) / (flightVariant.wobbleEnd - flightVariant.wobbleStart);
+      scale += Math.sin(heartK * Math.PI * 2) * flightVariant.wobbleAmp;
+    }
+
+    if (smooth < flightVariant.flutterUntil) {
+      const flutter = 1 - smooth / flightVariant.flutterUntil;
+      scale += Math.sin(smooth * Math.PI * 20) * flightVariant.flutterAmp * flutter;
+    }
+
+    const rotateDeg = Math.max(
+      -flightVariant.rotationClampDeg,
+      Math.min(flightVariant.rotationClampDeg, heading + flightVariant.rotationOffsetDeg),
+    );
+
+    return {
+      transform: `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) scale(${scale.toFixed(3)}) rotate(${rotateDeg.toFixed(2)}deg)`,
+    };
+  }, [effectiveProgress, flightVariant, viewportSize.height, viewportSize.width]);
 
   return (
     <section className="screen intro-screen intro-screen-scroll" ref={introRootRef}>
@@ -363,74 +345,37 @@ export function IntroView({ onOpen }: IntroViewProps) {
 
       <div className="intro-stage" ref={stageRef}>
         <section className="intro-snap intro-snap-hero" aria-label="Hero">
-          <div className="card intro-hero-card">
+          <div className="intro-ambient-copy" aria-hidden="true">
+            <p className="intro-scroll-whisper">Przewiń w dół, aby sprowadzić kopertę</p>
+          </div>
+          <div className="intro-floating-ui">
             <p className="intro-kicker">Mam coś dla Ciebie 💌</p>
             <h1>Mała niespodzianka</h1>
-            <p className="intro-subtitle">Przewiń, aby sprowadzić kopertę i otworzyć walentynkę.</p>
-            <div className="motion-mode-toggle" role="group" aria-label="Tryb animacji">
-              <button
-                type="button"
-                className={`motion-mode-btn ${motionMode === "full" ? "active" : ""}`}
-                onClick={() => setMotionMode("full")}
-                aria-pressed={motionMode === "full"}
-              >
-                Full
-              </button>
-              <button
-                type="button"
-                className={`motion-mode-btn ${motionMode === "lite" ? "active" : ""}`}
-                onClick={() => setMotionMode("lite")}
-                aria-pressed={motionMode === "lite"}
-              >
-                Lite
-              </button>
-              <button
-                type="button"
-                className={`motion-mode-btn ${motionMode === "off" ? "active" : ""}`}
-                onClick={() => setMotionMode("off")}
-                aria-pressed={motionMode === "off"}
-              >
-                Off
-              </button>
-            </div>
-            <button
-              type="button"
-              className="btn btn-secondary intro-skip-btn"
-              aria-label="Pomiń animację intro"
-              onClick={skipToLanded}
-            >
-              Pomiń animację intro
-            </button>
           </div>
         </section>
 
-        <section className="intro-snap intro-snap-landing" aria-label="Landing" ref={landingRef}>
-          <div className="card intro-card intro-landing-card">
-            <p className="intro-kicker">Lądowanie koperty</p>
-            <p className="intro-subtitle">Mocniejszy scroll lub dojedź do sekcji, żeby uruchomić animację.</p>
-
-            <div className="envelope-zone">
-              <div className={`envelope-shell phase-${flyPhase}`} style={envelopeStyle}>
-                <button type="button" className={`envelope ${opening ? "opening" : ""}`} onClick={handleOpen}>
-                  <span className="envelope-flap" />
-                  <span className="envelope-letter">💖</span>
-                  <span className="envelope-body">
-                    <span className="envelope-heart">💌</span>
-                  </span>
-                </button>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              className={`btn btn-primary intro-cta ${ctaVisible ? "cta-visible" : ""} ${ctaFastReveal ? "cta-fast" : ""}`}
-              onClick={handleOpen}
-              disabled={!ctaEnabled}
-            >
-              {valentineConfig.texts.introHint}
-            </button>
-          </div>
+        <section className="intro-snap intro-snap-landing" aria-label="Landing">
+          <div className="intro-scroll-spacer" aria-hidden="true" />
         </section>
+      </div>
+
+      <div className="intro-envelope-layer">
+        <div className="envelope-shell" style={envelopeStyle}>
+          <button
+            type="button"
+            className={`envelope ${opening ? "opening" : ""} ${envelopeReady ? "ready" : ""}`}
+            onClick={handleOpen}
+            aria-label="Dla Ciebie"
+          >
+            <span className="envelope-flap" />
+            <span className="envelope-letter">
+              <span className="envelope-note">Dla Ciebie</span>
+            </span>
+            <span className="envelope-body">
+              <span className="envelope-heart">💌</span>
+            </span>
+          </button>
+        </div>
       </div>
     </section>
   );
