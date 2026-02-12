@@ -5,16 +5,22 @@ alwaysApply: true
 
 # Core Workflow
 
-## What to do
+## Planning & Discovery
 
-- Use Plan -> Execute -> Verify for non-trivial tasks.
-- Keep diffs minimal, additive, and request-scoped.
-- Preserve unrelated local changes already present in the worktree.
-- End with a file-by-file summary plus validation status.
-- Ask for approval before destructive actions (deletes, moves, history rewrites, cached mass removals).
+- **Plan Mode First**: For any task involving more than 2 files or complex logic, switch to Plan Mode.
+- **Codebase Discovery**: Use semantic search (`codebase_search`) and `grep` to understand existing patterns before proposing changes.
+- **Trace Symbols**: Always trace definitions and usages of functions/classes before editing them.
 
-## Don't do
+## Implementation Standards
 
-- Do not commit secrets (`.env*`, tokens, keys).
-- Do not add trackers/analytics scripts without explicit approval.
-- Do not commit `node_modules`, `dist`, or other generated artifacts.
+- **Incremental Changes**: Make small, logical commits. Do not refactor unrelated code.
+- **Safety First**: NEVER update git config or run destructive commands without explicit approval.
+- **No Secrets**: Check for and exclude `.env`, tokens, or keys from any commit.
+- **Linter Awareness**: Run `read_lints` after edits and fix any introduced errors immediately.
+
+## Verification & Reporting
+
+- **Test Before Claiming**: Run relevant tests or build commands to verify changes.
+- **Manual Check**: If no tests exist, describe the manual verification steps taken.
+- **Summary**: End with a file-by-file summary plus validation status.
+- **Approval**: Ask for approval before destructive actions (deletes, moves, history rewrites).

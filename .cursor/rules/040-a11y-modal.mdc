@@ -1,21 +1,29 @@
 ---
-description: Accessibility rules for modal and keyboard interactions
-globs: "src/{components,views}/**/*.tsx"
+description: High-standard accessibility (A11y) rules for interactive elements and modals
+globs: "src/**/*.{ts,tsx,css}"
 alwaysApply: false
 ---
 
-# Modal Accessibility
+# Accessibility (A11y) Standards
 
-## What to do
+Ensuring the application is usable by everyone, including keyboard and screen reader users.
 
-- Keep modal semantics: `role=\"dialog\"` and `aria-modal=\"true\"`.
-- Support close on Escape and backdrop click (overlay-only target).
-- Move focus into modal on open, restore focus to opener on close.
-- Lock body scroll while open and restore it on cleanup.
-- Keep close controls keyboard-accessible with clear labels.
+## Interactive Elements
 
-## Don't do
+- **Accessible Names**: Every button/link must have a text label or `aria-label`. Icon-only buttons are FORBIDDEN without labels.
+- **Keyboard Navigation**: All interactive elements must be reachable via `Tab`. Use native `<button>` and `<a>` tags.
+- **Focus Indicators**: Never remove focus outlines without providing a high-visibility CSS alternative.
+- **Aria-Hidden**: Use `aria-hidden="true"` for decorative icons and illustrations.
 
-- Do not close on generic click events inside modal content.
-- Do not leave keydown listeners or body style mutations after close.
-- Do not hide action controls from keyboard flow without replacement.
+## Modals & Overlays
+
+- **Focus Trapping**: Modals MUST trap focus within their bounds while open.
+- **Escape Key**: All overlays must close on `Escape`.
+- **Focus Restoration**: Return focus to the trigger element when a modal closes.
+- **Semantics**: Use `role="dialog"` and `aria-modal="true"` for modal containers.
+
+## Visual & Motion
+
+- **Contrast**: Maintain a minimum contrast ratio of 4.5:1 for normal text.
+- **Motion Control**: Non-essential animations must be disabled if `prefers-reduced-motion` is active.
+- **Color Independence**: Do not convey meaning through color alone (e.g., error states should have icons or text).
