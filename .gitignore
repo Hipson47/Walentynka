@@ -1,11 +1,35 @@
+# Dependencies
 node_modules/
+
+# Build outputs
 dist/
-.DS_Store
+build/
+coverage/
+
+# Vite
+.vite/
+
+# TypeScript
+*.tsbuildinfo
+
+# Playwright
+playwright-report/
+test-results/
+
+# AI / IDE
+/.agent/
+/.cursor/
+
+# Environment
 .env
 .env.local
 .env.*.local
 .env*
+
+# Logs & temp
 *.log
-coverage/
-.vite/
 *.tmp
+
+# OS
+.DS_Store
+Thumbs.db
