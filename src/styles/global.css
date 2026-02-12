@@ -643,6 +643,28 @@ body {
   width: min(640px, 92vw);
 }
 
+/* Etap wyboru bez białej kartki – tytuł i opcje na tle */
+.choice-stage {
+  width: 100%;
+  max-width: min(720px, 96vw);
+}
+
+.choice-stage-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 0.5rem;
+}
+
+.choice-stage-title {
+  margin: 0;
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+}
+
 .layer-1 {
   transform: translateZ(30px);
 }
@@ -747,18 +769,26 @@ p {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 0.9rem;
+  width: 100%;
+  align-items: end;
 }
 
 .choice-card {
-  border: 2px solid transparent;
+  border: 2px solid rgba(255, 255, 255, 0.4);
   border-radius: 16px;
-  background: linear-gradient(145deg, #fff, #fde9ee);
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(6px);
   padding: 0.85rem;
   display: flex;
   flex-direction: column;
   gap: 0.55rem;
   align-items: center;
-  transition: transform 0.14s ease, border-color 0.14s ease;
+  transition: transform 0.14s ease, border-color 0.14s ease, background 0.2s ease, min-height 0.35s ease, padding 0.35s ease;
+  overflow: hidden;
+}
+
+.choice-stage .choice-card:hover:not(.choice-card-expanded) {
+  background: rgba(255, 255, 255, 0.35);
 }
 
 .choice-card:hover:not(.choice-card-expanded) {
@@ -772,6 +802,44 @@ p {
 
 .choice-card-tile.choice-card-expanded {
   min-height: 240px;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  animation: choice-card-pixel-build 0.5s steps(10) forwards;
+}
+
+@keyframes choice-card-pixel-build {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .choice-card-tile.choice-card-expanded {
+    animation: none;
+    clip-path: none;
+  }
+}
+
+.choice-card-minimized {
+  min-height: 0;
+  padding: 0.35rem;
+  min-width: 0;
+}
+
+.choice-card-minimized .choice-card-preview {
+  min-height: 0;
+  flex-direction: column;
+  gap: 0;
+  padding: 0.25rem;
+  justify-content: center;
+  min-width: 40px;
+}
+
+.choice-card-minimized .choice-icon {
+  font-size: 1.5rem;
 }
 
 .choice-card-inner {
@@ -1167,6 +1235,10 @@ p {
   .gif-wrap {
     width: clamp(220px, 68vw, 300px);
     max-height: clamp(170px, 32svh, 260px);
+  }
+
+  .choice-stage-title {
+    font-size: 1.55rem;
   }
 
   .choice-grid {

@@ -474,26 +474,27 @@ function ChoiceCard({ onSelect }: { onSelect: (choiceId: string) => void }) {
 
   return (
     <motion.div
-      className="intro-ask-card-wrap"
+      className="intro-ask-card-wrap choice-stage"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.24 }}
     >
-      <TiltCard className="card intro-ask-card card-wide">
-        <h1>{valentineConfig.texts.choiceHeadline}</h1>
-        <div className="choice-grid">
+      <div className="choice-stage-inner">
+        <h1 className="choice-stage-title">{valentineConfig.texts.choiceHeadline}</h1>
+        <div className="choice-grid" data-expanded={expandedId ?? ""}>
           {valentineConfig.choices.map((choice: ChoiceOption) => (
             <SingleChoiceCard
               key={choice.id}
               choice={choice}
               isExpanded={expandedId === choice.id}
+              isMinimized={expandedId != null && expandedId !== choice.id}
               onToggle={() => setExpandedId((id) => (id === choice.id ? null : choice.id))}
               onSelect={() => onSelect(choice.id)}
             />
           ))}
         </div>
-      </TiltCard>
+      </div>
     </motion.div>
   );
 }
@@ -501,11 +502,13 @@ function ChoiceCard({ onSelect }: { onSelect: (choiceId: string) => void }) {
 function SingleChoiceCard({
   choice,
   isExpanded,
+  isMinimized,
   onToggle,
   onSelect,
 }: {
   choice: ChoiceOption;
   isExpanded: boolean;
+  isMinimized: boolean;
   onToggle: () => void;
   onSelect: () => void;
 }) {
@@ -513,7 +516,9 @@ function SingleChoiceCard({
   const description = choice.description ?? choice.label;
 
   return (
-    <article className={`choice-card choice-card-tile ${isExpanded ? "choice-card-expanded" : ""}`}>
+    <article
+      className={`choice-card choice-card-tile ${isExpanded ? "choice-card-expanded" : ""} ${isMinimized ? "choice-card-minimized" : ""}`}
+    >
       <div className="choice-card-inner">
         {isExpanded ? (
           <>
@@ -533,7 +538,7 @@ function SingleChoiceCard({
         ) : (
           <button className="choice-card-preview" type="button" onClick={onToggle}>
             <span className="choice-icon">{choice.emoji}</span>
-            <span className="choice-label">{choice.label}</span>
+            {!isMinimized && <span className="choice-label">{choice.label}</span>}
           </button>
         )}
       </div>
