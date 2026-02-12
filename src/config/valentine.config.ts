@@ -2,6 +2,10 @@ export type ChoiceOption = {
   id: string;
   label: string;
   emoji: string;
+  /** Obrazek rodzaju randki (ścieżka w public/) */
+  imagePath?: string;
+  /** Opis rodzaju randki */
+  description?: string;
 };
 
 export const valentineConfig = {
@@ -35,9 +39,9 @@ export const valentineConfig = {
     ctaFadeMs: 240,
   },
   choices: [
-    { id: "dinner", label: "Kolacyjka", emoji: "🍝" },
-    { id: "movie", label: "film?", emoji: "🎬" },
-    { id: "walk", label: "Spacer?", emoji: "☕" },
+    { id: "dinner", label: "Kolacyjka", emoji: "🍝", imagePath: "/assets/gif/ask.gif", description: "Romantyczna kolacja we dwoje" },
+    { id: "movie", label: "film?", emoji: "🎬", imagePath: "/assets/gif/ask.gif", description: "Kino lub film w domu" },
+    { id: "walk", label: "Spacer?", emoji: "☕", imagePath: "/assets/gif/ask.gif", description: "Spacer z kubkiem kawy" },
   ] as ChoiceOption[],
   signature: "Z miłością",
   from: "",

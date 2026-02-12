@@ -7,7 +7,6 @@ import { GifWithFallback } from "../components/GifWithFallback";
 import { RunawayNoButton } from "../components/RunawayNoButton";
 import { TiltCard } from "../components/TiltCard";
 import { Modal } from "../components/Modal";
-import { ChoiceExitAnimation } from "../components/ChoiceExitAnimation";
 import { useMotionMode } from "../hooks/useMotionMode";
 import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 import {
@@ -471,6 +470,8 @@ function CelebrateCard({ onDone }: { onDone: () => void }) {
 }
 
 function ChoiceCard({ onSelect }: { onSelect: (choiceId: string) => void }) {
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
   return (
     <motion.div
       className="intro-ask-card-wrap"
@@ -483,21 +484,60 @@ function ChoiceCard({ onSelect }: { onSelect: (choiceId: string) => void }) {
         <h1>{valentineConfig.texts.choiceHeadline}</h1>
         <div className="choice-grid">
           {valentineConfig.choices.map((choice: ChoiceOption) => (
-            <article key={choice.id} className="choice-card layer-1">
-              <button
-                className="choice-select-btn"
-                type="button"
-                onClick={() => onSelect(choice.id)}
-              >
-                <span className="choice-icon">{choice.emoji}</span>
-                <span className="choice-label">{choice.label}</span>
-              </button>
-              <ChoiceExitAnimation />
-            </article>
+            <SingleChoiceCard
+              key={choice.id}
+              choice={choice}
+              isExpanded={expandedId === choice.id}
+              onToggle={() => setExpandedId((id) => (id === choice.id ? null : choice.id))}
+              onSelect={() => onSelect(choice.id)}
+            />
           ))}
         </div>
       </TiltCard>
     </motion.div>
+  );
+}
+
+function SingleChoiceCard({
+  choice,
+  isExpanded,
+  onToggle,
+  onSelect,
+}: {
+  choice: ChoiceOption;
+  isExpanded: boolean;
+  onToggle: () => void;
+  onSelect: () => void;
+}) {
+  const imageSrc = choice.imagePath ?? valentineConfig.gifPaths.ask;
+  const description = choice.description ?? choice.label;
+
+  return (
+    <article className={`choice-card choice-card-tile ${isExpanded ? "choice-card-expanded" : ""}`}>
+      <div className="choice-card-inner">
+        {isExpanded ? (
+          <>
+            <div className="choice-card-image-wrap">
+              <GifWithFallback src={imageSrc} alt={choice.label} fallback={choice.emoji} />
+            </div>
+            <p className="choice-card-description">{description}</p>
+            <div className="choice-card-actions">
+              <button className="choice-card-btn choice-card-btn-secondary" type="button" onClick={onToggle}>
+                Schowaj
+              </button>
+              <button className="choice-card-btn choice-card-btn-primary" type="button" onClick={onSelect}>
+                Wybieram
+              </button>
+            </div>
+          </>
+        ) : (
+          <button className="choice-card-preview" type="button" onClick={onToggle}>
+            <span className="choice-icon">{choice.emoji}</span>
+            <span className="choice-label">{choice.label}</span>
+          </button>
+        )}
+      </div>
+    </article>
   );
 }
 
