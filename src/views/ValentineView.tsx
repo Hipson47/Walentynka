@@ -38,10 +38,10 @@ const easeInOutSine = (t: number) => -(Math.cos(Math.PI * t) - 1) / 2;
 const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 const mix = (a: number, b: number, t: number) => a + (b - a) * t;
 
-const OPENING_JUMP_MS = 180;
-const OPENING_TOTAL_MS = 680;
-const CONTENT_SWAP_AT_MS = 140;
-const CELEBRATE_DURATION_MS = 7600;
+const OPENING_JUMP_MS = 90;
+const OPENING_TOTAL_MS = 340;
+const CONTENT_SWAP_AT_MS = 70;
+const CELEBRATE_DURATION_MS = 3800;
 
 type EnvelopePose = { x: number; y: number; scale: number; rotateDeg: number };
 
@@ -315,9 +315,9 @@ export function ValentineView({
         <EnvelopeScrollReveal containerRef={stageRef} motionMode={motionMode} />
       )}
 
-      {screen === "celebrate" && <HeartsCanvasOverlay durationMs={9000} variant="celebrate" />}
+      {screen === "celebrate" && <HeartsCanvasOverlay durationMs={4500} variant="celebrate" />}
       {(screen === "choice" || screen === "final") && (
-        <HeartsCanvasOverlay durationMs={12000} variant="ambient" />
+        <HeartsCanvasOverlay durationMs={6000} variant="ambient" />
       )}
 
       {showIntroUI ? (
@@ -379,7 +379,7 @@ export function ValentineView({
                 className="intro-ask-envelope-wrap"
                 initial={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.12 }}
+                transition={{ duration: 0.06 }}
               >
                 <button
                   ref={envelopeButtonRef}
@@ -406,7 +406,7 @@ export function ValentineView({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.18 }}
+                transition={{ duration: 0.09 }}
               >
                 <div className="content-stage">
                   <div className="image-container">
@@ -451,7 +451,7 @@ function CelebrateCard({ onDone }: { onDone: () => void }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.24 }}
+      transition={{ duration: 0.12 }}
     >
       <div className="content-stage">
         <div className="image-container">
@@ -477,7 +477,7 @@ function ChoiceCard({ onSelect }: { onSelect: (choiceId: string) => void }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.24 }}
+      transition={{ duration: 0.12 }}
     >
       <div className="choice-stage-inner">
         <h1 className="choice-stage-title">{valentineConfig.texts.choiceHeadline}</h1>
@@ -552,7 +552,7 @@ function FinalCard({ onOpenPs }: { onOpenPs: () => void }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.24 }}
+      transition={{ duration: 0.12 }}
     >
       <div className="content-stage">
         <div className="image-container">

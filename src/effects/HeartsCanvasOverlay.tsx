@@ -74,7 +74,7 @@ export function HeartsCanvasOverlay({
         rot: randomInRange(0, Math.PI * 2),
         rotSpeed: randomInRange(-2.2, 2.2),
         life: 0,
-        maxLife: isAmbient ? randomInRange(4.8, 7.2) : randomInRange(4.5, 7.0),
+        maxLife: isAmbient ? randomInRange(2.4, 3.6) : randomInRange(2.2, 3.5),
         size: isAmbient ? randomInRange(14, 22) : randomInRange(18, 34),
         icon: pickOne(HEARTS),
       });
@@ -127,7 +127,7 @@ export function HeartsCanvasOverlay({
         ctx.restore();
       }
 
-      if (elapsed <= durationMs + 2200 || particles.length > 0) {
+      if (elapsed <= durationMs + 1100 || particles.length > 0) {
         rafId = requestAnimationFrame(loop);
       }
     };
