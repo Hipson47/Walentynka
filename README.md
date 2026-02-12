@@ -8,6 +8,10 @@ Interaktywna kartka walentynkowa jako single-page state machine:
 4. Wybór randki (3 opcje)
 5. Finał + modal `PS...`
 
+## Prerequisites
+
+- Node.js 18+ (LTS recommended)
+
 ## Quick start
 
 ```bash
@@ -22,10 +26,17 @@ npm run build
 npm run preview
 ```
 
-Lint/test:
+## Testing
 
-- `npm run lint` - not configured in this template
-- `npm test` - not configured in this template
+- `npm test` — Vitest (unit tests)
+- `npm run test:e2e` — Playwright (starts preview server, runs E2E)
+- `npm run test:all` — unit + E2E
+
+Playwright generates `playwright-report/` i `test-results/` — są w `.gitignore`; uruchom `npm run test:e2e` aby je wygenerować lokalnie.
+
+## Lint
+
+ESLint nie jest skonfigurowany. Dodaj `npm run lint` w razie potrzeby.
 
 ## Customize in 3 minutes
 
@@ -37,7 +48,7 @@ Lint/test:
    - `ask.gif`
    - `yay.gif`
    - `final.gif` (opcjonalnie)
-3. Użyj `?to=Imię` w URL, np. `http://localhost:5173/?to=Asia`
+3. Użyj `?to=Imię` w URL, np. `http://localhost:5173/?to=Ola`
 
 ## Struktura
 
@@ -47,7 +58,6 @@ Lint/test:
 - `src/effects` - `HeartsCanvasOverlay` (canvas + rAF)
 - `src/hooks` - `usePrefersReducedMotion`
 - `src/config` - konfiguracja template
-- `legacy-static` - oryginalna wersja HTML/CSS/JS
 
 ## Deploy (Vercel)
 
@@ -86,12 +96,7 @@ Repo uzywa modularnych regul w `.cursor/rules/*.mdc`. Reguly wymuszaja:
 
 ## Repo hygiene
 
-- `node_modules/` jest ignorowane przez `.gitignore` i nie powinno byc trzymane w historii repo.
-- Jezeli kiedykolwiek bylo sledzone przez Git, usun tracking poleceniem:
-
-```bash
-git rm -r --cached node_modules
-```
+Ignorowane artefakty: `node_modules/`, `dist/`, `playwright-report/`, `test-results/`, `*.tsbuildinfo`, `.agent/`, `.cursor/`. Regeneruj lokalnie: `npm run build` (dist), `npm run test:e2e` (raporty Playwright).
 
 ## License
 

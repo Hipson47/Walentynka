@@ -20,6 +20,9 @@ test-results/
 /.agent/
 /.cursor/
 
+# Legacy (pre-React prototype)
+legacy-static/
+
 # Environment
 .env
 .env.local
