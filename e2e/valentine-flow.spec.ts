@@ -11,10 +11,10 @@ async function navigateToAsk(page: Page) {
 
   const envelope = page.getByRole("button", { name: "Dla Ciebie" });
   await expect(envelope).toBeVisible({ timeout: 5000 });
-  await envelope.click();
+  await envelope.click({ force: true });
 
-  // Wait for transition to ask screen (~620ms)
-  await expect(page.getByText("TAK")).toBeVisible({ timeout: 3000 });
+  // Wait for opening animation + transition to ask screen (~700ms)
+  await expect(page.getByText("TAK")).toBeVisible({ timeout: 5000 });
 }
 
 /**

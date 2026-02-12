@@ -5,14 +5,14 @@ description: Enforces UI quality baseline to prevent sloppy interfaces. Use when
 
 # UI Baseline
 
-Enforces an opinionated UI baseline to prevent AI-generated interface slop. Adapted from ibelick/baseline-ui for this vanilla CSS + React project.
+Enforces an opinionated UI baseline to prevent AI-generated interface slop. Adapted from ibelick/baseline-ui for this Tailwind + shadcn + React project.
 
 ## Stack (Project-Specific)
 
-- MUST use vanilla CSS (files in `src/styles/`)
-- MUST NOT use Tailwind CSS
+- MUST use Tailwind CSS + shadcn/ui for new UI components
+- Prefer `@/components/ui/*` (Button, Dialog, etc.) over custom implementations
 - MUST use vanilla `requestAnimationFrame` or CSS animations/transitions for motion
-- MUST use the project's existing component primitives first
+- MUST use the project's existing component primitives first (including shadcn)
 
 ## Components
 

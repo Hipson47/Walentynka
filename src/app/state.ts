@@ -4,6 +4,8 @@ export type AppState = {
   screen: ScreenState;
   selectedChoiceId: string | null;
   isPsOpen: boolean;
+  previousScreen: ScreenState | null;
+  isTransitioning: boolean;
 };
 
 export type AppEvent =
@@ -12,19 +14,27 @@ export type AppEvent =
   | { type: "CELEBRATE_DONE" }
   | { type: "SELECT_CHOICE"; payload: { choiceId: string } }
   | { type: "OPEN_PS" }
-  | { type: "CLOSE_PS" };
+  | { type: "CLOSE_PS" }
+  | { type: "END_TRANSITION" };
 
 export const initialState: AppState = {
   screen: "intro",
   selectedChoiceId: null,
   isPsOpen: false,
+  previousScreen: null,
+  isTransitioning: false,
 };
 
 export function appReducer(state: AppState, event: AppEvent): AppState {
   switch (event.type) {
     case "OPEN_ENVELOPE":
       if (state.screen !== "intro") return state;
-      return { ...state, screen: "ask" };
+      return {
+        ...state,
+        previousScreen: "intro",
+        screen: "ask",
+        isTransitioning: true,
+      };
     case "YES":
       if (state.screen !== "ask") return state;
       return { ...state, screen: "celebrate" };
@@ -42,6 +52,8 @@ export function appReducer(state: AppState, event: AppEvent): AppState {
       return { ...state, isPsOpen: true };
     case "CLOSE_PS":
       return { ...state, isPsOpen: false };
+    case "END_TRANSITION":
+      return { ...state, previousScreen: null, isTransitioning: false };
     default:
       return state;
   }

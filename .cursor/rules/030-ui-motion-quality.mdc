@@ -10,7 +10,7 @@ Enforcing high-quality interfaces and smooth animations while avoiding common AI
 
 ## UI & Layout Standards
 
-- **Modern CSS**: Use vanilla CSS (in `src/styles/`). DO NOT use Tailwind.
+- **Styling**: Use Tailwind CSS + shadcn/ui for new components. Prefer `@/components/ui/*` primitives. Custom styles go in `src/styles/global.css`.
 - **Viewport Units**: Use `dvh` (dynamic viewport height) instead of `vh` to avoid mobile browser chrome issues.
 - **Typography**: Use `text-wrap: balance` for headings and `text-wrap: pretty` for body text.
 - **Safe Areas**: Respect `safe-area-inset` for fixed elements on mobile devices.

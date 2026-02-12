@@ -8,7 +8,7 @@ alwaysApply: false
 
 ## What to do
 
-- Treat stack as verified: React 18, Vite 6, TypeScript 5.
+- Treat stack as verified: React 18, Vite 6, TypeScript 5, Tailwind CSS v4, shadcn/ui.
 - Assume strict TypeScript rules (`strict: true` in `tsconfig.app.json`).
 - Use only scripts from `package.json`:
   - `npm run dev`
@@ -19,4 +19,4 @@ alwaysApply: false
 ## Don't do
 
 - Do not invent `npm run lint` or `npm test` flows when not defined.
-- Do not assume Tailwind/ESLint/Prettier/PostCSS configs if files are absent.
+- Do not assume ESLint/Prettier configs if files are absent. Tailwind + shadcn are configured.
