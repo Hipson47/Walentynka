@@ -12,6 +12,12 @@
   --text-color: #590d22;
   --card-bg: #ffffffee;
   --shadow: 0 18px 50px rgba(255, 77, 109, 0.22);
+  /* Content stage – niezależne od sztywnej kartki, łatwa personalizacja */
+  --stage-bg: rgba(255, 255, 255, 0.3);
+  --stage-bg-blend: blur(10px);
+  --stage-max-width: min(560px, 92vw);
+  --stage-border: 1px solid rgba(255, 255, 255, 0.4);
+  --stage-radius: 24px;
   --font-heading: "Pacifico", cursive;
   --font-body: "Quicksand", "Segoe UI", sans-serif;
   --viewport-h: 100svh;
@@ -643,6 +649,34 @@ body {
   width: min(640px, 92vw);
 }
 
+/* Content stage – treść niezależna od sztywnej .card, elastyczne rozmiary */
+.content-stage {
+  width: 100%;
+  max-width: var(--stage-max-width);
+  min-height: 0;
+  background: var(--stage-bg);
+  backdrop-filter: var(--stage-bg-blend);
+  -webkit-backdrop-filter: var(--stage-bg-blend);
+  border: var(--stage-border);
+  border-radius: var(--stage-radius);
+  box-shadow: var(--shadow);
+  padding: 1.55rem 1.35rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.82rem;
+}
+
+.content-stage-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.82rem;
+  width: 100%;
+}
+
 /* Etap wyboru bez białej kartki – tytuł i opcje na tle */
 .choice-stage {
   width: 100%;
@@ -1008,7 +1042,9 @@ p {
 }
 
 :root[data-motion-mode="off"] .card,
-:root[data-hero-tier="low"] .card {
+:root[data-hero-tier="low"] .card,
+:root[data-motion-mode="off"] .content-stage,
+:root[data-hero-tier="low"] .content-stage {
   backdrop-filter: none;
   background: rgba(255, 255, 255, 0.94);
 }
@@ -1226,6 +1262,10 @@ p {
     min-height: 380px;
     padding: 1.25rem 0.98rem;
     gap: 0.72rem;
+  }
+
+  .content-stage {
+    padding: 1.25rem 0.98rem;
   }
 
   h1 {

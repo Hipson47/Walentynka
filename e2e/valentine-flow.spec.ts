@@ -41,6 +41,7 @@ async function navigateToChoice(page: Page) {
 async function navigateToFinal(page: Page) {
   await navigateToChoice(page);
   await page.getByText("Kolacyjka").click();
+  await page.getByText("Wybieram").click();
   await expect(page.getByText("Dobry wybór ✅")).toBeVisible({ timeout: 3000 });
 }
 
@@ -116,6 +117,7 @@ test.describe("Choice Screen", () => {
     await navigateToChoice(page);
 
     await page.getByText("Kolacyjka").click();
+    await page.getByText("Wybieram").click();
     await expect(page.getByText("Dobry wybór ✅")).toBeVisible({ timeout: 3000 });
     await expect(page.getByText("Nie mogę się doczekać! 💕")).toBeVisible();
     await expect(page.getByText("PS... 💌")).toBeVisible();

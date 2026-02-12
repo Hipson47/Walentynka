@@ -5,7 +5,6 @@ import { EnvelopeScrollReveal } from "../effects/EnvelopeScrollReveal";
 import { HeartsCanvasOverlay } from "../effects/HeartsCanvasOverlay";
 import { GifWithFallback } from "../components/GifWithFallback";
 import { RunawayNoButton } from "../components/RunawayNoButton";
-import { TiltCard } from "../components/TiltCard";
 import { Modal } from "../components/Modal";
 import { useMotionMode } from "../hooks/useMotionMode";
 import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
@@ -409,7 +408,7 @@ export function ValentineView({
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.18 }}
               >
-                <TiltCard className="card intro-ask-card">
+                <div className="content-stage">
                   <div className="image-container">
                     <GifWithFallback src={valentineConfig.gifPaths.ask} alt="Proszę" fallback="🥺💕" className="layer-1" />
                   </div>
@@ -420,7 +419,7 @@ export function ValentineView({
                     </button>
                     <RunawayNoButton getYesRect={() => yesRef.current?.getBoundingClientRect() ?? null} />
                   </div>
-                </TiltCard>
+                </div>
               </motion.div>
             ) : screen === "celebrate" ? (
               <CelebrateCard key="celebrate" onDone={onCelebrateDone} />
@@ -454,7 +453,7 @@ function CelebrateCard({ onDone }: { onDone: () => void }) {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.24 }}
     >
-      <TiltCard className="card intro-ask-card">
+      <div className="content-stage">
         <div className="image-container">
           <GifWithFallback
             src={valentineConfig.gifPaths.celebrate}
@@ -464,7 +463,7 @@ function CelebrateCard({ onDone }: { onDone: () => void }) {
           />
         </div>
         <h1 className="layer-1">{valentineConfig.texts.celebrateHeadline}</h1>
-      </TiltCard>
+      </div>
     </motion.div>
   );
 }
@@ -555,7 +554,7 @@ function FinalCard({ onOpenPs }: { onOpenPs: () => void }) {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.24 }}
     >
-      <TiltCard className="card intro-ask-card">
+      <div className="content-stage">
         <div className="image-container">
           <GifWithFallback
             src={valentineConfig.gifPaths.final}
@@ -571,7 +570,7 @@ function FinalCard({ onOpenPs }: { onOpenPs: () => void }) {
             PS... 💌
           </button>
         </div>
-      </TiltCard>
+      </div>
     </motion.div>
   );
 }
